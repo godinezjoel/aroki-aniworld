@@ -1,0 +1,12 @@
+{
+  "repositoryID": "godinezjoel-aniworld",
+  "name": "AniWorld Deutsch",
+  "connectors": [
+    "aniworld-deutsch",
+    "aniworld-omu"
+  ],
+  "logos": {
+    "aniworld-deutsch": "logos/aniworld.png",
+    "aniworld-omu": "logos/aniworld.png"
+  }
+}

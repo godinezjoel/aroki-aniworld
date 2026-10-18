@@ -1,0 +1,28 @@
+name: Verify collection
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Structural checks
+        run: |
+          python scripts/validate_connector.py aniworld-deutsch
+          python scripts/validate_connector.py aniworld-omu
+      - name: Signatures, hashes and release paths
+        run: python scripts/aroki_sign.py verify
+      - name: Signing scheme matches the Aroki-trusted kas021 index
+        run: python tests/test_signing_scheme.py

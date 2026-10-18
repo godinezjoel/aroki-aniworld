@@ -1,0 +1,8 @@
+# Signing keys must never be committed.
+*.key
+*.pem
+*.seed
+private*
+.venv/
+__pycache__/
+.DS_Store

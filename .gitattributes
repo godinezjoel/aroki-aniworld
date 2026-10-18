@@ -1,0 +1,4 @@
+# index.json pins each manifest's SHA-256 and signature to its exact bytes.
+# Keep JSON as LF everywhere so Windows checkouts do not change those bytes.
+*.json text eol=lf
+*.png binary
