@@ -43,13 +43,35 @@
       "releaseTrack": "beta",
       "status": "active",
       "version": "1.0.0"
+    },
+    {
+      "contentRating": "unknown",
+      "contentType": "video",
+      "familyID": "animegg-english-dub",
+      "icon": {
+        "path": "logos/animegg.png",
+        "sha256": "e6e5b6ed81c5e6415371a48207b42b926fe482355750ba7213dac182fc838a0a"
+      },
+      "id": "animegg-english-dub",
+      "language": "en",
+      "manifest": {
+        "path": "connectors/animegg-english-dub/releases/c0c6fce941bb9af58793403c2cd23b67fdc861791ce5534c7fb77e3822b4d6f6/connector.json",
+        "sha256": "c0c6fce941bb9af58793403c2cd23b67fdc861791ce5534c7fb77e3822b4d6f6",
+        "signature": "2/klGIk6O0aJIVY1NnQx+ddK9c0D3tTsT7M3GBGT9Je7EZpm04AHCYyZhZO7LIwmayG+ab2TTcu3DoLaDwA8Cg=="
+      },
+      "minimumAppVersion": "0.1.0",
+      "name": "AnimeGG English Dub",
+      "releaseNotes": "English Dub from AnimeGG. Lists only episodes AnimeGG marks as dubbed and plays the English audio track. Use AniWorld Deutsch for German Dub and AniWorld OmU for subtitles.",
+      "releaseTrack": "beta",
+      "status": "active",
+      "version": "1.0.0"
     }
   ],
   "enabled": true,
-  "generatedAt": 1792330838,
+  "generatedAt": 1792332947,
   "name": "AniWorld Deutsch",
   "publicKey": "3ZGNhvnQ1GGtYG0p31WlnPURvjJN719BEVE+/uMUlmc=",
   "repositoryID": "godinezjoel-aniworld",
   "schemaVersion": 1,
-  "signature": "ihmYDyJFwwCtLgseLZKjaS1poCgGykHmD4vNZc9mQp0lhXBaejZJi8agEuztXRpmSpF1xBexCRvtjqXM7DE4Bw=="
+  "signature": "Cxtk4oZJemIYZY0LmRL5AbOiN2cBdMKITicPqDlMbFGruoHc1WVm10wUv4YX9g1+IRWSVJaF2qhf7GikTp1bCw=="
 }

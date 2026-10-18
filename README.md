@@ -7,8 +7,17 @@ the priority; Japanese audio with subtitles is the fallback.
 |---|---|---|
 | **AniWorld Deutsch** | `aniworld-deutsch` | German Dub first. If an episode has no German audio, falls back to Japanese audio with German subtitles, then English subtitles. |
 | **AniWorld OmU** | `aniworld-omu` | Original audio (mostly Japanese) with German subtitles, English-subtitle fallback. |
+| **AnimeGG English Dub** | `animegg-english-dub` | English Dub only. Lists only episodes AnimeGG marks as dubbed. Use it when an episode has no German Dub. |
 
-Both require AROKI `2.0.36` or newer. They are derived from the AniWorld
+AniWorld itself has no English Dub (its English option is Japanese audio with
+English subtitles), so English Dub comes from AnimeGG. That connector is
+derived from kas021's Aroki-accepted AnimeGG `1.1.1` manifest
+(`templates/animegg-1.1.1.json`) with value-only changes, and works on any
+AROKI version. AnimeGG often lists titles under their Japanese names
+(for example *Ore dake Level Up na Ken* for Solo Leveling); searching the
+English name usually still finds them.
+
+The AniWorld connectors require AROKI `2.0.36` or newer. They are derived from the AniWorld
 `0.3.2` manifest published in
 [kas021/AROKI-Connectors](https://github.com/kas021/AROKI-Connectors) and use
 only keys from that manifest, because AROKI rejects unknown manifest keys
@@ -65,7 +74,9 @@ py scripts/generate_connectors.py templates/aniworld-0.3.2.json
 # bump "version" for every changed connector before publishing
 py scripts/validate_connector.py aniworld-deutsch
 py scripts/validate_connector.py aniworld-omu
+py scripts/validate_connector.py animegg-english-dub
 py tests/live_test.py connectors/aniworld-deutsch/connector.json "one punch man"
+py tests/live_test_animegg.py connectors/animegg-english-dub/connector.json "solo leveling"
 py scripts/aroki_sign.py publish
 git add -A
 git commit -m "Publish AniWorld update"

@@ -22,6 +22,7 @@ jobs:
         run: |
           python scripts/validate_connector.py aniworld-deutsch
           python scripts/validate_connector.py aniworld-omu
+          python scripts/validate_connector.py animegg-english-dub
       - name: Signatures, hashes and release paths
         run: python scripts/aroki_sign.py verify
       - name: Signing scheme matches the Aroki-trusted kas021 index

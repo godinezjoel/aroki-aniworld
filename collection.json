@@ -3,10 +3,12 @@
   "name": "AniWorld Deutsch",
   "connectors": [
     "aniworld-deutsch",
-    "aniworld-omu"
+    "aniworld-omu",
+    "animegg-english-dub"
   ],
   "logos": {
     "aniworld-deutsch": "logos/aniworld.png",
-    "aniworld-omu": "logos/aniworld.png"
+    "aniworld-omu": "logos/aniworld.png",
+    "animegg-english-dub": "logos/animegg.png"
   }
 }

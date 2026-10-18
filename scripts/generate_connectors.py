@@ -51,10 +51,42 @@ def build(base: dict, *, connector_id: str, name: str, version: str, language: s
     return manifest
 
 
+def build_english_dub(base: dict) -> dict:
+    """English Dub only, from kas021's AnimeGG 1.1.1 (per-episode Sub/Dub, MP4 via vidcache)."""
+    manifest = copy.deepcopy(base)
+    manifest["id"] = manifest["familyID"] = "animegg-english-dub"
+    manifest["name"] = "AnimeGG English Dub"
+    manifest["version"] = "1.0.0"
+    manifest["releaseTrack"] = "beta"
+    manifest["attribution"]["author"] = "godinezjoel"
+    manifest["authorization"] = {
+        "basis": "personal",
+        "note": "Experimental declarative connector. Use only content you are entitled to access; "
+                "no third-party content or distribution rights are supplied.",
+    }
+    episodes = manifest["operations"]["episodes"]["extract"]
+    episodes["collection"] = "ul.newmanga > li > div:has(span.btn-dubbed)"
+    variants = episodes["fields"]["availableVariants"]
+    variants["collection"] = "span.btn-dubbed"
+    variants["transforms"] = [
+        {"op": "lowercased"},
+        {"op": "replaceFirst", "find": "dubbed", "with": "dub"},
+    ]
+    manifest["operations"]["streams"]["variants"] = ["dub"]
+    manifest["releaseNotes"] = (
+        "English Dub from AnimeGG. Lists only episodes AnimeGG marks as dubbed and plays the English "
+        "audio track. Use AniWorld Deutsch for German Dub and AniWorld OmU for subtitles."
+    )
+    return manifest
+
+
 def main() -> None:
     base = json.loads(Path(sys.argv[1]).read_bytes())
     if base.get("version") != "0.3.2" or base.get("id") != "aniworld-expansion":
         raise SystemExit("expected the kas021 aniworld-expansion 0.3.2 manifest as template")
+    animegg = json.loads((ROOT / "templates" / "animegg-1.1.1.json").read_bytes())
+    if animegg.get("version") != "1.1.1" or animegg.get("id") != "animegg":
+        raise SystemExit("expected the kas021 animegg 1.1.1 manifest in templates/")
 
     connectors = [
         build(
@@ -85,6 +117,7 @@ def main() -> None:
                 "Use AniWorld Deutsch for German Dub. Streams via Vidmoly."
             ),
         ),
+        build_english_dub(animegg),
     ]
     for manifest in connectors:
         path = ROOT / "connectors" / manifest["id"] / "connector.json"
