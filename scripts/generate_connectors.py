@@ -52,7 +52,7 @@ def build(base: dict, *, connector_id: str, name: str, version: str, language: s
 
 
 def discovery_sections(base: dict, home_title: str) -> list[dict]:
-    """Home rows: new and popular list pages, then the full front page.
+    """Home rows: new, popular and upcoming (two-week release calendar), then the front page.
 
     All rows reuse the accepted front-page section; only id, title, semantic
     and URL change. The item selector matches AniWorld's cover cards on /neu
@@ -63,6 +63,7 @@ def discovery_sections(base: dict, home_title: str) -> list[dict]:
     for row_id, title, semantic, path in (
         ("new", "Neu auf AniWorld", "recent", "/neu"),
         ("popular", "Beliebt auf AniWorld", "popular", "/beliebte-animes"),
+        ("upcoming", "Demnächst auf AniWorld", "all", "/animekalender"),
         ("home", home_title, "all", "/"),
     ):
         row = copy.deepcopy(home)
@@ -114,7 +115,7 @@ def main() -> None:
             base,
             connector_id="aniworld-deutsch",
             name="AniWorld Deutsch",
-            version="1.1.0",
+            version="1.2.0",
             language="de",
             variant="dub",
             order=["de-dub", "de-sub", "en-sub"],
@@ -128,7 +129,7 @@ def main() -> None:
             base,
             connector_id="aniworld-omu",
             name="AniWorld OmU",
-            version="1.1.0",
+            version="1.2.0",
             language="mul",
             variant="sub",
             order=["de-sub", "en-sub"],
