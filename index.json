@@ -7,16 +7,16 @@
       "id": "aniworld-deutsch",
       "language": "de",
       "manifest": {
-        "path": "connectors/aniworld-deutsch/releases/350c3080b12dbd2c5611bbdbad2245b5e2ad463549a2f09e3ec7479c16893453/connector.json",
-        "sha256": "350c3080b12dbd2c5611bbdbad2245b5e2ad463549a2f09e3ec7479c16893453",
-        "signature": "2TLRkl3Y7/hdIkRo8LOft2QWXf8Zid8S0DEzkRbS9ubMeatn+vzKrDoEbL01yQaoIIZ9mhgL/luoNC0TqzedCA=="
+        "path": "connectors/aniworld-deutsch/releases/48ec1b3426124fc6857c12e28072c721e7671d53bfca75c98a7a973d73f7db93/connector.json",
+        "sha256": "48ec1b3426124fc6857c12e28072c721e7671d53bfca75c98a7a973d73f7db93",
+        "signature": "ae1v3lBlOwsvH8XP2uir0h2P+yBZO0wKAHMYiOgnnjZ8czRxCucIPn/awkMLwJAwEkMjOcH63Bdp3iNy5+f0AQ=="
       },
       "minimumAppVersion": "2.0.36",
       "name": "AniWorld Deutsch",
       "releaseNotes": "German Dub first. If an episode has no German audio, playback falls back to Japanese audio with German subtitles, then English subtitles. Streams via Vidmoly.",
       "releaseTrack": "beta",
       "status": "active",
-      "version": "1.0.0"
+      "version": "1.1.0"
     },
     {
       "contentRating": "unknown",
@@ -25,16 +25,16 @@
       "id": "aniworld-omu",
       "language": "mul",
       "manifest": {
-        "path": "connectors/aniworld-omu/releases/74b101ae7fc53ec074f40c81127e76fedd82d127f84c0cffa5055599c56f0f2e/connector.json",
-        "sha256": "74b101ae7fc53ec074f40c81127e76fedd82d127f84c0cffa5055599c56f0f2e",
-        "signature": "NS+CmVHiZor5XhvYVKLaSwUcweVw9YDDHPE2jqJdNkHbXqwJmruUN1c82VYswF0yQY32VEda6ZvoPc5oUtP0Cg=="
+        "path": "connectors/aniworld-omu/releases/647459fc0805b2649db12c970877c19f8c92545835a0680074bf5a871026f716/connector.json",
+        "sha256": "647459fc0805b2649db12c970877c19f8c92545835a0680074bf5a871026f716",
+        "signature": "P0ez9yQIse3CVwOOoUlhnuXGP2bEX+4KtaUeVEoGptMox13BPULar6Byk8C986ygqqQoPY3TLnBIjGvuyA4iCw=="
       },
       "minimumAppVersion": "2.0.36",
       "name": "AniWorld OmU",
       "releaseNotes": "Original audio (mostly Japanese) with German subtitles, English-subtitle fallback. Use AniWorld Deutsch for German Dub. Streams via Vidmoly.",
       "releaseTrack": "beta",
       "status": "active",
-      "version": "1.0.0"
+      "version": "1.1.0"
     },
     {
       "contentRating": "unknown",
@@ -56,10 +56,10 @@
     }
   ],
   "enabled": true,
-  "generatedAt": 1792332947,
+  "generatedAt": 1792522984,
   "name": "AniWorld Deutsch",
   "publicKey": "3ZGNhvnQ1GGtYG0p31WlnPURvjJN719BEVE+/uMUlmc=",
   "repositoryID": "godinezjoel-aniworld",
   "schemaVersion": 1,
-  "signature": "oCjuwsdLXORYNQOvlIjIsaWzRPd+xBuY+EhX/XpJti4OQpClyQ+34pHPkcV4VudUx9HJvFuXP59oZ4cird7vCQ=="
+  "signature": "D0kfd/imLZvrZB8CBMBf/26Z52D7GkFmnIJ37W+2eybq/FTZGHIJaA4T9OA4We0MRXp/EJOxLuInn89pkqq9Cw=="
 }

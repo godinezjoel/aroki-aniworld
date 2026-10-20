@@ -3,7 +3,7 @@
   "id": "aniworld-deutsch",
   "familyID": "aniworld-deutsch",
   "name": "AniWorld Deutsch",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "minimumAppVersion": "2.0.36",
   "requiredEngineFeatures": [
     "form-post-v1",
@@ -414,6 +414,94 @@
     },
     "discovery": {
       "sections": [
+        {
+          "id": "new",
+          "title": "Neu auf AniWorld",
+          "semantic": "recent",
+          "request": {
+            "method": "GET",
+            "urlTemplate": "https://aniworld.to/neu"
+          },
+          "response": {
+            "format": "html"
+          },
+          "pagination": {
+            "type": "none"
+          },
+          "items": {
+            "collection": "a[href^='/anime/stream/']:has(img[data-src]):has(h3):not([href*='/staffel-']):not([href*='/episode-'])",
+            "fields": {
+              "sourceID": {
+                "selector": "a",
+                "part": "attr",
+                "attr": "href",
+                "transforms": [
+                  {
+                    "op": "lastPathComponent"
+                  }
+                ]
+              },
+              "title": {
+                "selector": "h3",
+                "part": "text"
+              },
+              "posterURL": {
+                "selector": "img[data-src]",
+                "part": "attr",
+                "attr": "data-src",
+                "transforms": [
+                  {
+                    "op": "absolutize"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "popular",
+          "title": "Beliebt auf AniWorld",
+          "semantic": "popular",
+          "request": {
+            "method": "GET",
+            "urlTemplate": "https://aniworld.to/beliebte-animes"
+          },
+          "response": {
+            "format": "html"
+          },
+          "pagination": {
+            "type": "none"
+          },
+          "items": {
+            "collection": "a[href^='/anime/stream/']:has(img[data-src]):has(h3):not([href*='/staffel-']):not([href*='/episode-'])",
+            "fields": {
+              "sourceID": {
+                "selector": "a",
+                "part": "attr",
+                "attr": "href",
+                "transforms": [
+                  {
+                    "op": "lastPathComponent"
+                  }
+                ]
+              },
+              "title": {
+                "selector": "h3",
+                "part": "text"
+              },
+              "posterURL": {
+                "selector": "img[data-src]",
+                "part": "attr",
+                "attr": "data-src",
+                "transforms": [
+                  {
+                    "op": "absolutize"
+                  }
+                ]
+              }
+            }
+          }
+        },
         {
           "id": "home",
           "title": "AniWorld Deutsch",

@@ -46,9 +46,30 @@ def build(base: dict, *, connector_id: str, name: str, version: str, language: s
     manifest["operations"]["streams"]["mirrors"] = [
         vidmoly_mirror(template, LANG_KEYS[key], variant) for key in order
     ]
-    manifest["operations"]["discovery"]["sections"][0]["title"] = section_title
+    manifest["operations"]["discovery"]["sections"] = discovery_sections(base, section_title)
     manifest["releaseNotes"] = notes
     return manifest
+
+
+def discovery_sections(base: dict, home_title: str) -> list[dict]:
+    """Home rows: new and popular list pages, then the full front page.
+
+    All rows reuse the accepted front-page section; only id, title, semantic
+    and URL change. The item selector matches AniWorld's cover cards on /neu
+    and /beliebte-animes as well as on the front page.
+    """
+    home = base["operations"]["discovery"]["sections"][0]
+    rows = []
+    for row_id, title, semantic, path in (
+        ("new", "Neu auf AniWorld", "recent", "/neu"),
+        ("popular", "Beliebt auf AniWorld", "popular", "/beliebte-animes"),
+        ("home", home_title, "all", "/"),
+    ):
+        row = copy.deepcopy(home)
+        row["id"], row["title"], row["semantic"] = row_id, title, semantic
+        row["request"]["urlTemplate"] = "https://aniworld.to" + path
+        rows.append(row)
+    return rows
 
 
 def build_english_dub(base: dict) -> dict:
@@ -93,7 +114,7 @@ def main() -> None:
             base,
             connector_id="aniworld-deutsch",
             name="AniWorld Deutsch",
-            version="1.0.0",
+            version="1.1.0",
             language="de",
             variant="dub",
             order=["de-dub", "de-sub", "en-sub"],
@@ -107,7 +128,7 @@ def main() -> None:
             base,
             connector_id="aniworld-omu",
             name="AniWorld OmU",
-            version="1.0.0",
+            version="1.1.0",
             language="mul",
             variant="sub",
             order=["de-sub", "en-sub"],

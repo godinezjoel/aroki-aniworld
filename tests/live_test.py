@@ -97,14 +97,13 @@ def check(cond, label):
 
 
 # Discovery
-sec = ops["discovery"]["sections"][0]
-base, html = fetch(sec["request"]["urlTemplate"])
-items = soup(html).select(css(sec["items"]["collection"]))
-print(f"discovery: {len(items)} items")
-check(len(items) > 0, "home discovery returns items")
-if items:
-    first = {k: field(items[0], r, base) for k, r in sec["items"]["fields"].items()}
-    print("   first:", first)
+for sec in ops["discovery"]["sections"]:  # every Home row needs ID, title and poster
+    base, html = fetch(sec["request"]["urlTemplate"])
+    items = soup(html).select(css(sec["items"]["collection"]))
+    rows = [{k: field(item, r, base) for k, r in sec["items"]["fields"].items()} for item in items]
+    complete = [r for r in rows if r["sourceID"] and r["title"] and r["posterURL"]]
+    check(rows and len(complete) == len(rows),
+          f"discovery {sec['id']!r} ({sec['title']}): {len(rows)} items, first {rows[0]['title'] if rows else None!r}")
 
 for query in titles:
     print(f"\n=== search {query!r}")
