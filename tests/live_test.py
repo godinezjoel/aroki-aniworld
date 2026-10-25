@@ -112,6 +112,7 @@ def check(cond, label):
 
 
 SLUG = re.compile(r"(?!staffel-|episode-)[\w.-]+")  # /anime/stream/<slug>; never an episode or season link
+LANGUAGE_TAGS = {"Ger", "GerSub", "EngSub"}  # AniWorld lists these among a title's genres
 
 
 def fetch_or_none(url, headers=None, data=None):
@@ -192,6 +193,7 @@ def open_title(title_id, streams=True):
     check(details["title"] and details["posterURL"], f"details: {details['title']!r}")
     if "genres" in details:
         check(details["genres"] and all(details["genres"]), f"details genres: {details['genres']}")
+        check(not LANGUAGE_TAGS & set(details["genres"]), "details genres have no language tags")
 
     ep = ops["episodes"]
     seasons = doc.select(css(ep["extract"]["collection"]))

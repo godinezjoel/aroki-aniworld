@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "aniworld-test-b",
-  "familyID": "aniworld-test-b",
-  "name": "AniWorld Test B",
-  "version": "0.1.0",
+  "id": "aniworld-deutsch",
+  "familyID": "aniworld-deutsch",
+  "name": "AniWorld Deutsch",
+  "version": "1.5.0",
   "minimumAppVersion": "2.0.36",
   "requiredEngineFeatures": [
     "form-post-v1",
@@ -109,6 +109,9 @@
               "op": "absolutize"
             }
           ]
+        },
+        "genres": {
+          "collection": "div.genres li a[itemprop=genre]:not([href*='/genre/ger']):not([href*='/genre/engsub'])"
         }
       }
     },
@@ -459,7 +462,9 @@
                     "op": "absolutize"
                   }
                 ]
-              },
+              }
+            },
+            "metadata": {
               "genres": {
                 "collection": "small"
               }
@@ -506,7 +511,9 @@
                     "op": "absolutize"
                   }
                 ]
-              },
+              }
+            },
+            "metadata": {
               "genres": {
                 "collection": "small"
               }
@@ -555,7 +562,9 @@
                     "op": "absolutize"
                   }
                 ]
-              },
+              }
+            },
+            "metadata": {
               "genres": {
                 "collection": "small"
               }
@@ -565,5 +574,5 @@
       ]
     }
   },
-  "releaseNotes": "TEMPORARY TEST, will be removed. Find a Niche test B: declares each Browse item's main genre as an item field, items.fields.genres. Browse All pages through AniWorld's German Dub list (25 pages). Playback, search and details as AniWorld Deutsch 1.4.0."
+  "releaseNotes": "German Dub first. If an episode has no German audio, playback falls back to Japanese audio with German subtitles, then English subtitles. Streams via Vidmoly. Search shows posters. Browse All lists AniWorld's German Dub titles (750, # to S), and every title declares its genres for Find a Niche."
 }

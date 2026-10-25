@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "aniworld-test-d",
-  "familyID": "aniworld-test-d",
-  "name": "AniWorld Test D",
-  "version": "0.1.0",
+  "id": "aniworld-omu",
+  "familyID": "aniworld-omu",
+  "name": "AniWorld OmU",
+  "version": "1.5.0",
   "minimumAppVersion": "2.0.36",
   "requiredEngineFeatures": [
     "form-post-v1",
@@ -14,7 +14,7 @@
     "bounded-mirrors-v1"
   ],
   "contentType": "video",
-  "language": "de",
+  "language": "mul",
   "contentRating": "unknown",
   "releaseTrack": "beta",
   "status": "active",
@@ -111,7 +111,7 @@
           ]
         },
         "genres": {
-          "collection": "div.genres li a[itemprop=genre]"
+          "collection": "div.genres li a[itemprop=genre]:not([href*='/genre/ger']):not([href*='/genre/engsub'])"
         }
       }
     },
@@ -163,7 +163,7 @@
           ]
         },
         "variant": {
-          "literal": "dub"
+          "literal": "sub"
         },
         "response": {
           "format": "html"
@@ -207,78 +207,7 @@
       "mirrors": [
         {
           "variants": [
-            "dub"
-          ],
-          "inputHosts": [
-            "aniworld.to"
-          ],
-          "finalMediaPolicy": "public-https",
-          "steps": [
-            {
-              "request": {
-                "method": "GET",
-                "follow": "episodeURL"
-              },
-              "response": {
-                "format": "html"
-              },
-              "extract": {
-                "context": {
-                  "embed": {
-                    "kind": "url",
-                    "selector": "li[data-lang-key='1'][data-link-target]:has(h4:contains(Vidmoly))",
-                    "part": "attr",
-                    "attr": "data-link-target",
-                    "transforms": [
-                      {
-                        "op": "absolutize"
-                      }
-                    ]
-                  }
-                }
-              }
-            },
-            {
-              "request": {
-                "method": "GET",
-                "follow": "embed",
-                "headers": {
-                  "Referer": "https://aniworld.to/"
-                }
-              },
-              "response": {
-                "format": "literal-selection",
-                "scriptSelector": "script:containsData(player.setup)",
-                "selection": {
-                  "kind": "call-object-fields",
-                  "name": "player.setup",
-                  "properties": [
-                    "sources"
-                  ]
-                }
-              },
-              "extract": {
-                "collection": "value.sources[*]",
-                "fields": {
-                  "url": {
-                    "path": "file",
-                    "transforms": [
-                      {
-                        "op": "absolutize"
-                      }
-                    ]
-                  },
-                  "mediaTypeHint": {
-                    "literal": "hls"
-                  }
-                }
-              }
-            }
-          ]
-        },
-        {
-          "variants": [
-            "dub"
+            "sub"
           ],
           "inputHosts": [
             "aniworld.to"
@@ -349,7 +278,7 @@
         },
         {
           "variants": [
-            "dub"
+            "sub"
           ],
           "inputHosts": [
             "aniworld.to"
@@ -463,6 +392,11 @@
                   }
                 ]
               }
+            },
+            "metadata": {
+              "genres": {
+                "collection": "small"
+              }
             }
           }
         },
@@ -507,16 +441,21 @@
                   }
                 ]
               }
+            },
+            "metadata": {
+              "genres": {
+                "collection": "small"
+              }
             }
           }
         },
         {
           "id": "all",
-          "title": "Alle Animes mit German Dub",
+          "title": "Alle Animes mit deutschen Untertiteln",
           "semantic": "all",
           "request": {
             "method": "GET",
-            "urlTemplate": "https://aniworld.to/genre/ger/{page}"
+            "urlTemplate": "https://aniworld.to/genre/gersub/{page}"
           },
           "response": {
             "format": "html"
@@ -553,11 +492,16 @@
                   }
                 ]
               }
+            },
+            "metadata": {
+              "genres": {
+                "collection": "small"
+              }
             }
           }
         }
       ]
     }
   },
-  "releaseNotes": "TEMPORARY TEST, will be removed. Find a Niche test D: declares no item genres; all genres of the title page as details genres together with a paged All catalogue (only already-accepted keys). Browse All pages through AniWorld's German Dub list (25 pages). Playback, search and details as AniWorld Deutsch 1.4.0."
+  "releaseNotes": "Original audio (mostly Japanese) with German subtitles, English-subtitle fallback. Use AniWorld Deutsch for German Dub. Streams via Vidmoly. Search shows posters. Browse All lists AniWorld's German-subtitle titles (750, # to G), and every title declares its genres for Find a Niche."
 }

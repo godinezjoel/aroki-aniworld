@@ -7,16 +7,16 @@
       "id": "aniworld-deutsch",
       "language": "de",
       "manifest": {
-        "path": "connectors/aniworld-deutsch/releases/f35b24d216767cc0f94a8b9c1a3281cd893ff1b84883e778d18743115bb9a1fb/connector.json",
-        "sha256": "f35b24d216767cc0f94a8b9c1a3281cd893ff1b84883e778d18743115bb9a1fb",
-        "signature": "Mb9c6iFOXvHl1eeOB2azTlkVe39ZoumHA40iQR/l09pAiCM2wHjTGqXtvJ8r2lVlpkvEuxRPB01uDwEvli2gBw=="
+        "path": "connectors/aniworld-deutsch/releases/7785f5645841035fb667bc042f5134a56a3a11f35692ea7dd40e70047f79aa7b/connector.json",
+        "sha256": "7785f5645841035fb667bc042f5134a56a3a11f35692ea7dd40e70047f79aa7b",
+        "signature": "d1UP+XcdhgugFsobk51xigUUj+5Sw+ZuxKJM7TSDhLXdIyXUi2bBQtsqmnc/nAU0z9if2UfrBPQO2S16yTqRAA=="
       },
       "minimumAppVersion": "2.0.36",
       "name": "AniWorld Deutsch",
-      "releaseNotes": "German Dub first. If an episode has no German audio, playback falls back to Japanese audio with German subtitles, then English subtitles. Streams via Vidmoly. Search shows posters; Browse has AniWorld's popular titles and main genres.",
+      "releaseNotes": "German Dub first. If an episode has no German audio, playback falls back to Japanese audio with German subtitles, then English subtitles. Streams via Vidmoly. Search shows posters. Browse All lists AniWorld's German Dub titles (750, # to S), and every title declares its genres for Find a Niche.",
       "releaseTrack": "beta",
       "status": "active",
-      "version": "1.4.0"
+      "version": "1.5.0"
     },
     {
       "contentRating": "unknown",
@@ -25,16 +25,16 @@
       "id": "aniworld-omu",
       "language": "mul",
       "manifest": {
-        "path": "connectors/aniworld-omu/releases/1ae0bae737c801c57dcd9546c27e812cffb01d048ea16e33cf4bf05d3033a3a2/connector.json",
-        "sha256": "1ae0bae737c801c57dcd9546c27e812cffb01d048ea16e33cf4bf05d3033a3a2",
-        "signature": "u3pp0ZFbaHRE0iyHm7PnWmejXw13fna6LWo9cQzM1+QpBDBJxfY0xNzYAsvONikXuDHKte1mb8ITMfymJLvmBQ=="
+        "path": "connectors/aniworld-omu/releases/7d9611d4c4dc1a8bcd94a93e3d81d449b2a7626d5e3f8df7da87df5da4896ec9/connector.json",
+        "sha256": "7d9611d4c4dc1a8bcd94a93e3d81d449b2a7626d5e3f8df7da87df5da4896ec9",
+        "signature": "3/cJXSXBc9j9B56NSMkEDI41CDWPJgVYRjtmQd2ohx+t1Yzz0T5ZqiqVlbodHYzlvk3hf36jBakkj4zbN2VHCA=="
       },
       "minimumAppVersion": "2.0.36",
       "name": "AniWorld OmU",
-      "releaseNotes": "Original audio (mostly Japanese) with German subtitles, English-subtitle fallback. Use AniWorld Deutsch for German Dub. Streams via Vidmoly. Search shows posters; Browse has AniWorld's popular titles and main genres.",
+      "releaseNotes": "Original audio (mostly Japanese) with German subtitles, English-subtitle fallback. Use AniWorld Deutsch for German Dub. Streams via Vidmoly. Search shows posters. Browse All lists AniWorld's German-subtitle titles (750, # to G), and every title declares its genres for Find a Niche.",
       "releaseTrack": "beta",
       "status": "active",
-      "version": "1.4.0"
+      "version": "1.5.0"
     },
     {
       "contentRating": "unknown",
@@ -53,85 +53,13 @@
       "releaseTrack": "beta",
       "status": "active",
       "version": "1.0.0"
-    },
-    {
-      "contentRating": "unknown",
-      "contentType": "video",
-      "familyID": "aniworld-test-a",
-      "id": "aniworld-test-a",
-      "language": "de",
-      "manifest": {
-        "path": "connectors/aniworld-test-a/releases/f426b2df2cbe748d5a695d00923b9b5d4d79ca3545f58efd16825b06f9f0c913/connector.json",
-        "sha256": "f426b2df2cbe748d5a695d00923b9b5d4d79ca3545f58efd16825b06f9f0c913",
-        "signature": "F7858B8+kjQQ1zSAM2gHBUf0M3VIdpi6uslwGSJqnG4fBtrlEZTTbFJXEYeFKYVMCS/6q3rzQseR0bNyTz1IAA=="
-      },
-      "minimumAppVersion": "2.0.36",
-      "name": "AniWorld Test A",
-      "releaseNotes": "TEMPORARY TEST, will be removed. Find a Niche test A: declares each Browse item's main genre as items.metadata.genres (the shape of kas021's AniKage 0.3.0 and DonghuaWorld 1.1.1). Browse All pages through AniWorld's German Dub list (25 pages). Playback, search and details as AniWorld Deutsch 1.4.0.",
-      "releaseTrack": "beta",
-      "status": "active",
-      "version": "0.1.0"
-    },
-    {
-      "contentRating": "unknown",
-      "contentType": "video",
-      "familyID": "aniworld-test-b",
-      "id": "aniworld-test-b",
-      "language": "de",
-      "manifest": {
-        "path": "connectors/aniworld-test-b/releases/6799fdf9a78e62a7aab7420587689c3afdfc9d281fd6bd4f86349cf454ace046/connector.json",
-        "sha256": "6799fdf9a78e62a7aab7420587689c3afdfc9d281fd6bd4f86349cf454ace046",
-        "signature": "22Wwjf1kVJ8S1nac5GWe+oc/Q/8cYteQfeIEwI8fPfR6oderZouJeQ9i7vqb3jlc7hOkIsm735CN45jYMN0aCg=="
-      },
-      "minimumAppVersion": "2.0.36",
-      "name": "AniWorld Test B",
-      "releaseNotes": "TEMPORARY TEST, will be removed. Find a Niche test B: declares each Browse item's main genre as an item field, items.fields.genres. Browse All pages through AniWorld's German Dub list (25 pages). Playback, search and details as AniWorld Deutsch 1.4.0.",
-      "releaseTrack": "beta",
-      "status": "active",
-      "version": "0.1.0"
-    },
-    {
-      "contentRating": "unknown",
-      "contentType": "video",
-      "familyID": "aniworld-test-c",
-      "id": "aniworld-test-c",
-      "language": "de",
-      "manifest": {
-        "path": "connectors/aniworld-test-c/releases/bce7db93da5284bd8411c243626b84886ad7b099148a5eec3679419d989ef863/connector.json",
-        "sha256": "bce7db93da5284bd8411c243626b84886ad7b099148a5eec3679419d989ef863",
-        "signature": "VhS0Kq6YhRrSoae7OPbGdKc9a9PW/ENL2ZUJj367ZYBzzrnGjlvZ4F+KzPG/0oauiFJYe5wc/EBhB4o3qI2dAA=="
-      },
-      "minimumAppVersion": "2.0.36",
-      "name": "AniWorld Test C",
-      "releaseNotes": "TEMPORARY TEST, will be removed. Find a Niche test C: declares each Browse item's main genre as items.metadata.genres, plus all genres of the title page as details genres. Browse All pages through AniWorld's German Dub list (25 pages). Playback, search and details as AniWorld Deutsch 1.4.0.",
-      "releaseTrack": "beta",
-      "status": "active",
-      "version": "0.1.0"
-    },
-    {
-      "contentRating": "unknown",
-      "contentType": "video",
-      "familyID": "aniworld-test-d",
-      "id": "aniworld-test-d",
-      "language": "de",
-      "manifest": {
-        "path": "connectors/aniworld-test-d/releases/0032f403cc23e0fce2c4d93e051bebf1435ea719d35e70f3ceeab81a88b9d9db/connector.json",
-        "sha256": "0032f403cc23e0fce2c4d93e051bebf1435ea719d35e70f3ceeab81a88b9d9db",
-        "signature": "msIIXZpL4NZnhqjqnCeBjv0Fk3dVSlelZmDXX+goLvaBQVFoJ6/7znVk1rfEkEiFXThyZQI6EAc39e2uUq27Bw=="
-      },
-      "minimumAppVersion": "2.0.36",
-      "name": "AniWorld Test D",
-      "releaseNotes": "TEMPORARY TEST, will be removed. Find a Niche test D: declares no item genres; all genres of the title page as details genres together with a paged All catalogue (only already-accepted keys). Browse All pages through AniWorld's German Dub list (25 pages). Playback, search and details as AniWorld Deutsch 1.4.0.",
-      "releaseTrack": "beta",
-      "status": "active",
-      "version": "0.1.0"
     }
   ],
   "enabled": true,
-  "generatedAt": 1792957135,
+  "generatedAt": 1792961502,
   "name": "AniWorld Deutsch",
   "publicKey": "3ZGNhvnQ1GGtYG0p31WlnPURvjJN719BEVE+/uMUlmc=",
   "repositoryID": "godinezjoel-aniworld",
   "schemaVersion": 1,
-  "signature": "gQJA3tAEzwk8w5iowXWb6zjSOjxu1p68odyOcAVuTHvuF+43g1ceO2MAc7NBo68ymsPqpOMWKq64tw2XUzsIDg=="
+  "signature": "RPXBDz7qwQzoUcGUDA2OmCBAmukWrBcRdacd9OHGLOjJH4Owc2+ldtjhoFaayGBHkttxvAUQeBrh7VZLO1vvCw=="
 }
