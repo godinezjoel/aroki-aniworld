@@ -4,11 +4,19 @@
   "connectors": [
     "aniworld-deutsch",
     "aniworld-omu",
-    "animegg-english-dub"
+    "animegg-english-dub",
+    "aniworld-test-a",
+    "aniworld-test-b",
+    "aniworld-test-c",
+    "aniworld-test-d"
   ],
   "logos": {
     "aniworld-deutsch": "logos/aniworld.png",
     "aniworld-omu": "logos/aniworld.png",
-    "animegg-english-dub": "logos/animegg.png"
+    "animegg-english-dub": "logos/animegg.png",
+    "aniworld-test-a": "logos/aniworld.png",
+    "aniworld-test-b": "logos/aniworld.png",
+    "aniworld-test-c": "logos/aniworld.png",
+    "aniworld-test-d": "logos/aniworld.png"
   }
 }

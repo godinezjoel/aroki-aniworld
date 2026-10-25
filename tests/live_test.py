@@ -2,9 +2,10 @@
 
 This is not the native Aroki engine: it interprets the manifest's selectors and
 transforms with BeautifulSoup/soupsieve to confirm they match real pages.
-Checks every discovery section (paged genre sections on their first two and
-last allowed page), opens one genre title, then searches each query and opens
-the first hit.
+Checks every discovery section (paged sections on their first two and last
+allowed page), opens one title from page 2 of the first paged section, then
+searches each query and opens the first hit. Declared genres (item field,
+item metadata or details) must be non-empty and are printed as samples.
 
 Usage: py tests/live_test.py connectors/aniworld-deutsch/connector.json "query" ...
 """
@@ -67,6 +68,14 @@ def transform(value, transforms, base):
             value = BeautifulSoup(value, "html.parser").get_text().strip()
         elif op == "replaceFirst":
             value = value.replace(t["find"], t["with"], 1)
+        elif op == "trim":
+            value = value.strip()
+        elif op == "lowercased":
+            value = value.lower()
+        elif op == "removePrefix":
+            value = value[len(t["value"]):] if value.startswith(t["value"]) else value
+        elif op == "removeSuffix":
+            value = value[:-len(t["value"])] if value.endswith(t["value"]) else value
         else:
             raise SystemExit(f"unhandled transform {op}")
     return value
@@ -131,7 +140,26 @@ def discovery_rows(sec, page):
     if html is None:
         return []
     items = soup(html).select(css(sec["items"]["collection"]))
-    return [{k: field(item, r, base) for k, r in sec["items"]["fields"].items()} for item in items]
+    rows = []
+    for item in items:
+        row = {k: field(item, r, base) for k, r in sec["items"]["fields"].items()}
+        if "metadata" in sec["items"]:
+            row["metadata"] = {k: field(item, r, base) for k, r in sec["items"]["metadata"].items()}
+        rows.append(row)
+    return rows
+
+
+def item_genres(sec):
+    """Where a discovery section declares per-item genres: 'fields', 'metadata' or None."""
+    if "genres" in sec["items"]["fields"]:
+        return "fields"
+    if "genres" in sec["items"].get("metadata", {}):
+        return "metadata"
+    return None
+
+
+def genres_of(row, where):
+    return row["genres"] if where == "fields" else row["metadata"]["genres"]
 
 
 def search(query):
@@ -162,6 +190,8 @@ def open_title(title_id, streams=True):
     doc = soup(html)
     details = {k: field(doc, r, base) for k, r in ops["details"]["extract"].items()}
     check(details["title"] and details["posterURL"], f"details: {details['title']!r}")
+    if "genres" in details:
+        check(details["genres"] and all(details["genres"]), f"details genres: {details['genres']}")
 
     ep = ops["episodes"]
     seasons = doc.select(css(ep["extract"]["collection"]))
@@ -236,8 +266,18 @@ for sec in ops["discovery"]["sections"]:
         complete = [r for r in rows if r["sourceID"] and SLUG.fullmatch(r["sourceID"]) and r["title"] and r["posterURL"]]
         label = f"discovery {sec['id']!r} ({sec['title']})" + (f" page {page}" if page is not None else "")
         check(rows and len(complete) == len(rows), f"{label}: {len(rows)} items, first {rows[0]['title'] if rows else None!r}")
+        where = item_genres(sec)
+        if where and rows:
+            genres = [genres_of(r, where) for r in rows]
+            check(all(g and all(g) for g in genres), f"{label}: every item has {where} genres")
+            counts = {}
+            for value in (v for g in genres for v in g):
+                counts[value] = counts.get(value, 0) + 1
+            print(f"   {where} genres:", dict(sorted(counts.items(), key=lambda kv: -kv[1])))
+            print("   samples:", [(r["title"], genres_of(r, where)) for r in rows[:3]])
         seen[page] = {r["sourceID"] for r in rows}
-        if sec.get("semantic") == "genre" and page == 2 and rows and genre_pick is None:
+        paged = (sec.get("pagination") or {}).get("type") == "pageParam"
+        if paged and page == 2 and rows and genre_pick is None:
             genre_pick = (sec["title"], rows[0])
     if len(seen) > 1:
         first, second = sorted(seen)[:2]
@@ -245,7 +285,7 @@ for sec in ops["discovery"]["sections"]:
 
 if genre_pick:
     genre, row = genre_pick
-    print(f"\n=== genre {genre!r} page 2: {row['title']!r}, titleID {row['sourceID']}")
+    print(f"\n=== {genre!r} page 2: {row['title']!r}, titleID {row['sourceID']}")
     open_title(row["sourceID"], streams=False)
 
 for query in titles:
