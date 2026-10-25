@@ -3,7 +3,7 @@
   "id": "aniworld-omu",
   "familyID": "aniworld-omu",
   "name": "AniWorld OmU",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "minimumAppVersion": "2.0.36",
   "requiredEngineFeatures": [
     "form-post-v1",
@@ -42,11 +42,8 @@
   "operations": {
     "search": {
       "request": {
-        "method": "POST",
-        "urlTemplate": "https://aniworld.to/ajax/search",
-        "formFields": {
-          "keyword": "{query}"
-        },
+        "method": "GET",
+        "urlTemplate": "https://aniworld.to/ajax/seriesSearch?keyword={query}",
         "headers": {
           "Referer": "https://aniworld.to/search",
           "X-Requested-With": "XMLHttpRequest"
@@ -67,10 +64,18 @@
             ]
           },
           "title": {
-            "path": "title",
+            "path": "name",
             "transforms": [
               {
                 "op": "htmlText"
+              }
+            ]
+          },
+          "posterURL": {
+            "path": "cover",
+            "transforms": [
+              {
+                "op": "absolutize"
               }
             ]
           }
@@ -474,9 +479,561 @@
               }
             }
           }
+        },
+        {
+          "id": "genre-abenteuer",
+          "title": "Abenteuer",
+          "semantic": "genre",
+          "request": {
+            "method": "GET",
+            "urlTemplate": "https://aniworld.to/genre/abenteuer/{page}"
+          },
+          "response": {
+            "format": "html"
+          },
+          "pagination": {
+            "type": "pageParam",
+            "start": 1,
+            "maxPages": 23
+          },
+          "items": {
+            "collection": "a[href^='/anime/stream/']:has(img[data-src]):has(h3):not([href*='/staffel-']):not([href*='/episode-'])",
+            "fields": {
+              "sourceID": {
+                "selector": "a",
+                "part": "attr",
+                "attr": "href",
+                "transforms": [
+                  {
+                    "op": "lastPathComponent"
+                  }
+                ]
+              },
+              "title": {
+                "selector": "h3",
+                "part": "text"
+              },
+              "posterURL": {
+                "selector": "img[data-src]",
+                "part": "attr",
+                "attr": "data-src",
+                "transforms": [
+                  {
+                    "op": "absolutize"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "genre-action",
+          "title": "Action",
+          "semantic": "genre",
+          "request": {
+            "method": "GET",
+            "urlTemplate": "https://aniworld.to/genre/action/{page}"
+          },
+          "response": {
+            "format": "html"
+          },
+          "pagination": {
+            "type": "pageParam",
+            "start": 1,
+            "maxPages": 25
+          },
+          "items": {
+            "collection": "a[href^='/anime/stream/']:has(img[data-src]):has(h3):not([href*='/staffel-']):not([href*='/episode-'])",
+            "fields": {
+              "sourceID": {
+                "selector": "a",
+                "part": "attr",
+                "attr": "href",
+                "transforms": [
+                  {
+                    "op": "lastPathComponent"
+                  }
+                ]
+              },
+              "title": {
+                "selector": "h3",
+                "part": "text"
+              },
+              "posterURL": {
+                "selector": "img[data-src]",
+                "part": "attr",
+                "attr": "data-src",
+                "transforms": [
+                  {
+                    "op": "absolutize"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "genre-alltagsleben",
+          "title": "Alltagsleben",
+          "semantic": "genre",
+          "request": {
+            "method": "GET",
+            "urlTemplate": "https://aniworld.to/genre/alltagsleben/{page}"
+          },
+          "response": {
+            "format": "html"
+          },
+          "pagination": {
+            "type": "pageParam",
+            "start": 1,
+            "maxPages": 25
+          },
+          "items": {
+            "collection": "a[href^='/anime/stream/']:has(img[data-src]):has(h3):not([href*='/staffel-']):not([href*='/episode-'])",
+            "fields": {
+              "sourceID": {
+                "selector": "a",
+                "part": "attr",
+                "attr": "href",
+                "transforms": [
+                  {
+                    "op": "lastPathComponent"
+                  }
+                ]
+              },
+              "title": {
+                "selector": "h3",
+                "part": "text"
+              },
+              "posterURL": {
+                "selector": "img[data-src]",
+                "part": "attr",
+                "attr": "data-src",
+                "transforms": [
+                  {
+                    "op": "absolutize"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "genre-drama",
+          "title": "Drama",
+          "semantic": "genre",
+          "request": {
+            "method": "GET",
+            "urlTemplate": "https://aniworld.to/genre/drama/{page}"
+          },
+          "response": {
+            "format": "html"
+          },
+          "pagination": {
+            "type": "pageParam",
+            "start": 1,
+            "maxPages": 25
+          },
+          "items": {
+            "collection": "a[href^='/anime/stream/']:has(img[data-src]):has(h3):not([href*='/staffel-']):not([href*='/episode-'])",
+            "fields": {
+              "sourceID": {
+                "selector": "a",
+                "part": "attr",
+                "attr": "href",
+                "transforms": [
+                  {
+                    "op": "lastPathComponent"
+                  }
+                ]
+              },
+              "title": {
+                "selector": "h3",
+                "part": "text"
+              },
+              "posterURL": {
+                "selector": "img[data-src]",
+                "part": "attr",
+                "attr": "data-src",
+                "transforms": [
+                  {
+                    "op": "absolutize"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "genre-fantasy",
+          "title": "Fantasy",
+          "semantic": "genre",
+          "request": {
+            "method": "GET",
+            "urlTemplate": "https://aniworld.to/genre/fantasy/{page}"
+          },
+          "response": {
+            "format": "html"
+          },
+          "pagination": {
+            "type": "pageParam",
+            "start": 1,
+            "maxPages": 25
+          },
+          "items": {
+            "collection": "a[href^='/anime/stream/']:has(img[data-src]):has(h3):not([href*='/staffel-']):not([href*='/episode-'])",
+            "fields": {
+              "sourceID": {
+                "selector": "a",
+                "part": "attr",
+                "attr": "href",
+                "transforms": [
+                  {
+                    "op": "lastPathComponent"
+                  }
+                ]
+              },
+              "title": {
+                "selector": "h3",
+                "part": "text"
+              },
+              "posterURL": {
+                "selector": "img[data-src]",
+                "part": "attr",
+                "attr": "data-src",
+                "transforms": [
+                  {
+                    "op": "absolutize"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "genre-horror",
+          "title": "Horror",
+          "semantic": "genre",
+          "request": {
+            "method": "GET",
+            "urlTemplate": "https://aniworld.to/genre/horror/{page}"
+          },
+          "response": {
+            "format": "html"
+          },
+          "pagination": {
+            "type": "pageParam",
+            "start": 1,
+            "maxPages": 5
+          },
+          "items": {
+            "collection": "a[href^='/anime/stream/']:has(img[data-src]):has(h3):not([href*='/staffel-']):not([href*='/episode-'])",
+            "fields": {
+              "sourceID": {
+                "selector": "a",
+                "part": "attr",
+                "attr": "href",
+                "transforms": [
+                  {
+                    "op": "lastPathComponent"
+                  }
+                ]
+              },
+              "title": {
+                "selector": "h3",
+                "part": "text"
+              },
+              "posterURL": {
+                "selector": "img[data-src]",
+                "part": "attr",
+                "attr": "data-src",
+                "transforms": [
+                  {
+                    "op": "absolutize"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "genre-komoedie",
+          "title": "Komödie",
+          "semantic": "genre",
+          "request": {
+            "method": "GET",
+            "urlTemplate": "https://aniworld.to/genre/komoedie/{page}"
+          },
+          "response": {
+            "format": "html"
+          },
+          "pagination": {
+            "type": "pageParam",
+            "start": 1,
+            "maxPages": 25
+          },
+          "items": {
+            "collection": "a[href^='/anime/stream/']:has(img[data-src]):has(h3):not([href*='/staffel-']):not([href*='/episode-'])",
+            "fields": {
+              "sourceID": {
+                "selector": "a",
+                "part": "attr",
+                "attr": "href",
+                "transforms": [
+                  {
+                    "op": "lastPathComponent"
+                  }
+                ]
+              },
+              "title": {
+                "selector": "h3",
+                "part": "text"
+              },
+              "posterURL": {
+                "selector": "img[data-src]",
+                "part": "attr",
+                "attr": "data-src",
+                "transforms": [
+                  {
+                    "op": "absolutize"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "genre-mecha",
+          "title": "Mecha",
+          "semantic": "genre",
+          "request": {
+            "method": "GET",
+            "urlTemplate": "https://aniworld.to/genre/mecha/{page}"
+          },
+          "response": {
+            "format": "html"
+          },
+          "pagination": {
+            "type": "pageParam",
+            "start": 1,
+            "maxPages": 4
+          },
+          "items": {
+            "collection": "a[href^='/anime/stream/']:has(img[data-src]):has(h3):not([href*='/staffel-']):not([href*='/episode-'])",
+            "fields": {
+              "sourceID": {
+                "selector": "a",
+                "part": "attr",
+                "attr": "href",
+                "transforms": [
+                  {
+                    "op": "lastPathComponent"
+                  }
+                ]
+              },
+              "title": {
+                "selector": "h3",
+                "part": "text"
+              },
+              "posterURL": {
+                "selector": "img[data-src]",
+                "part": "attr",
+                "attr": "data-src",
+                "transforms": [
+                  {
+                    "op": "absolutize"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "genre-mystery",
+          "title": "Mystery",
+          "semantic": "genre",
+          "request": {
+            "method": "GET",
+            "urlTemplate": "https://aniworld.to/genre/mystery/{page}"
+          },
+          "response": {
+            "format": "html"
+          },
+          "pagination": {
+            "type": "pageParam",
+            "start": 1,
+            "maxPages": 11
+          },
+          "items": {
+            "collection": "a[href^='/anime/stream/']:has(img[data-src]):has(h3):not([href*='/staffel-']):not([href*='/episode-'])",
+            "fields": {
+              "sourceID": {
+                "selector": "a",
+                "part": "attr",
+                "attr": "href",
+                "transforms": [
+                  {
+                    "op": "lastPathComponent"
+                  }
+                ]
+              },
+              "title": {
+                "selector": "h3",
+                "part": "text"
+              },
+              "posterURL": {
+                "selector": "img[data-src]",
+                "part": "attr",
+                "attr": "data-src",
+                "transforms": [
+                  {
+                    "op": "absolutize"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "genre-romanze",
+          "title": "Romanze",
+          "semantic": "genre",
+          "request": {
+            "method": "GET",
+            "urlTemplate": "https://aniworld.to/genre/romanze/{page}"
+          },
+          "response": {
+            "format": "html"
+          },
+          "pagination": {
+            "type": "pageParam",
+            "start": 1,
+            "maxPages": 25
+          },
+          "items": {
+            "collection": "a[href^='/anime/stream/']:has(img[data-src]):has(h3):not([href*='/staffel-']):not([href*='/episode-'])",
+            "fields": {
+              "sourceID": {
+                "selector": "a",
+                "part": "attr",
+                "attr": "href",
+                "transforms": [
+                  {
+                    "op": "lastPathComponent"
+                  }
+                ]
+              },
+              "title": {
+                "selector": "h3",
+                "part": "text"
+              },
+              "posterURL": {
+                "selector": "img[data-src]",
+                "part": "attr",
+                "attr": "data-src",
+                "transforms": [
+                  {
+                    "op": "absolutize"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "genre-scifi",
+          "title": "Scifi",
+          "semantic": "genre",
+          "request": {
+            "method": "GET",
+            "urlTemplate": "https://aniworld.to/genre/scifi/{page}"
+          },
+          "response": {
+            "format": "html"
+          },
+          "pagination": {
+            "type": "pageParam",
+            "start": 1,
+            "maxPages": 16
+          },
+          "items": {
+            "collection": "a[href^='/anime/stream/']:has(img[data-src]):has(h3):not([href*='/staffel-']):not([href*='/episode-'])",
+            "fields": {
+              "sourceID": {
+                "selector": "a",
+                "part": "attr",
+                "attr": "href",
+                "transforms": [
+                  {
+                    "op": "lastPathComponent"
+                  }
+                ]
+              },
+              "title": {
+                "selector": "h3",
+                "part": "text"
+              },
+              "posterURL": {
+                "selector": "img[data-src]",
+                "part": "attr",
+                "attr": "data-src",
+                "transforms": [
+                  {
+                    "op": "absolutize"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "genre-sport",
+          "title": "Sport",
+          "semantic": "genre",
+          "request": {
+            "method": "GET",
+            "urlTemplate": "https://aniworld.to/genre/sport/{page}"
+          },
+          "response": {
+            "format": "html"
+          },
+          "pagination": {
+            "type": "pageParam",
+            "start": 1,
+            "maxPages": 5
+          },
+          "items": {
+            "collection": "a[href^='/anime/stream/']:has(img[data-src]):has(h3):not([href*='/staffel-']):not([href*='/episode-'])",
+            "fields": {
+              "sourceID": {
+                "selector": "a",
+                "part": "attr",
+                "attr": "href",
+                "transforms": [
+                  {
+                    "op": "lastPathComponent"
+                  }
+                ]
+              },
+              "title": {
+                "selector": "h3",
+                "part": "text"
+              },
+              "posterURL": {
+                "selector": "img[data-src]",
+                "part": "attr",
+                "attr": "data-src",
+                "transforms": [
+                  {
+                    "op": "absolutize"
+                  }
+                ]
+              }
+            }
+          }
         }
       ]
     }
   },
-  "releaseNotes": "Original audio (mostly Japanese) with German subtitles, English-subtitle fallback. Use AniWorld Deutsch for German Dub. Streams via Vidmoly."
+  "releaseNotes": "Original audio (mostly Japanese) with German subtitles, English-subtitle fallback. Use AniWorld Deutsch for German Dub. Streams via Vidmoly. Search shows posters; Browse has AniWorld's popular titles and main genres."
 }

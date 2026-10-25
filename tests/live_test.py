@@ -2,10 +2,16 @@
 
 This is not the native Aroki engine: it interprets the manifest's selectors and
 transforms with BeautifulSoup/soupsieve to confirm they match real pages.
+Checks every discovery section (paged genre sections on their first two and
+last allowed page), opens one genre title, then searches each query and opens
+the first hit.
+
+Usage: py tests/live_test.py connectors/aniworld-deutsch/connector.json "query" ...
 """
 import json
 import re
 import sys
+import urllib.error
 import urllib.parse
 import urllib.request
 import warnings
@@ -96,28 +102,62 @@ def check(cond, label):
     ok = ok and bool(cond)
 
 
-# Discovery
-for sec in ops["discovery"]["sections"]:  # every Home row needs ID, title and poster
-    base, html = fetch(sec["request"]["urlTemplate"])
+SLUG = re.compile(r"(?!staffel-|episode-)[\w.-]+")  # /anime/stream/<slug>; never an episode or season link
+
+
+def fetch_or_none(url, headers=None, data=None):
+    """fetch() that reports an HTTP error (such as a page past the last one) instead of raising."""
+    try:
+        return fetch(url, headers, data)
+    except urllib.error.HTTPError as error:
+        print(f"  HTTP {error.code} for {url}")
+        return url, None
+
+
+def section_pages(sec):
+    """Pages to check: none for single-page rows; first two and last allowed page for pageParam."""
+    pagination = sec.get("pagination") or {"type": "none"}
+    if pagination["type"] != "pageParam":
+        return [None]
+    first, last = pagination["start"], pagination["start"] + pagination["maxPages"] - 1
+    return sorted({first, min(first + 1, last), last})
+
+
+def discovery_rows(sec, page):
+    url = sec["request"]["urlTemplate"]
+    if page is not None:
+        url = url.replace("{page}", str(page))
+    base, html = fetch_or_none(url)
+    if html is None:
+        return []
     items = soup(html).select(css(sec["items"]["collection"]))
-    rows = [{k: field(item, r, base) for k, r in sec["items"]["fields"].items()} for item in items]
-    complete = [r for r in rows if r["sourceID"] and r["title"] and r["posterURL"]]
-    check(rows and len(complete) == len(rows),
-          f"discovery {sec['id']!r} ({sec['title']}): {len(rows)} items, first {rows[0]['title'] if rows else None!r}")
+    return [{k: field(item, r, base) for k, r in sec["items"]["fields"].items()} for item in items]
 
-for query in titles:
-    print(f"\n=== search {query!r}")
-    s = ops["search"]["request"]
-    _, body = fetch(s["urlTemplate"], s["headers"], urllib.parse.urlencode({"keyword": query}).encode())
-    results = json.loads(body)
-    hits = [{k: transform(r.get(rule["path"]), rule["transforms"], "https://aniworld.to/") for k, rule in ops["search"]["items"]["fields"].items()} for r in results]
-    hits = [h for h in hits if "/anime/stream/" in next((r["link"] for r in results if r.get("link", "").endswith(h["sourceID"] or "")), "")]
-    check(hits, f"search returns anime results ({len(hits)})")
-    if not hits:
-        continue
-    title_id = hits[0]["sourceID"]
-    print("   titleID:", title_id, "|", hits[0]["title"])
 
+def search(query):
+    spec = ops["search"]
+    request = spec["request"]
+    if request["method"] == "POST":
+        url = request["urlTemplate"]
+        form = {k: v.replace("{query}", query) for k, v in request["formFields"].items()}
+        data = urllib.parse.urlencode(form).encode()
+    else:
+        url, data = request["urlTemplate"].replace("{query}", urllib.parse.quote(query)), None
+    base, body = fetch(url, request.get("headers"), data)
+    results = json.loads(body) if body.strip() else []  # json-empty-array: an empty body means no hits
+    fields = spec["items"]["fields"]
+    return [{k: transform(r.get(rule["path"]), rule.get("transforms"), base) for k, rule in fields.items()}
+            for r in results]
+
+
+def is_image(url):
+    req = urllib.request.Request(url, headers={"User-Agent": UA})
+    with opener.open(req, timeout=15) as r:
+        return r.headers.get("Content-Type", "").startswith("image/")
+
+
+def open_title(title_id, streams=True):
+    """Run details, episodes and (optionally) streams for one titleID, like the app does."""
     base, html = fetch(ops["details"]["request"]["urlTemplate"].replace("{titleID}", title_id))
     doc = soup(html)
     details = {k: field(doc, r, base) for k, r in ops["details"]["extract"].items()}
@@ -142,11 +182,11 @@ for query in titles:
         counts[key] = counts.get(key, 0) + 1
         check(set(e["availableVariants"]) <= {"sub", "dub"}, f"S{e['season']}E{e['episodeNumber']} variants {e['availableVariants']}") if not set(e["availableVariants"]) <= {"sub", "dub"} else None
     print("   variant tags:", counts, f"over {len(episodes)} episodes")
-    check(all(set(e["availableVariants"]) <= {"sub", "dub"} for e in episodes), "every tag is sub or dub")
+    check(episodes and all(set(e["availableVariants"]) <= {"sub", "dub"} for e in episodes),
+          f"{len(episodes)} episodes, every tag is sub or dub")
 
-    if not episodes:
-        print("   no episodes listed for this title")
-        continue
+    if not episodes or not streams:
+        return
     target = episodes[0]
     for variant in ("dub", "sub"):
         tagged = variant in target["availableVariants"]
@@ -184,6 +224,45 @@ for query in titles:
             check(resolved and resolved[3], f"{variant} resolves to a playable HLS master")
         else:
             check(resolved is None or True, f"{variant} not offered for this episode")
+
+
+# Discovery: every row (and the first two and the last allowed page of a paged
+# section) needs items with ID, title and poster; page 2 must differ from page 1.
+genre_pick = None
+for sec in ops["discovery"]["sections"]:
+    seen = {}
+    for page in section_pages(sec):
+        rows = discovery_rows(sec, page)
+        complete = [r for r in rows if r["sourceID"] and SLUG.fullmatch(r["sourceID"]) and r["title"] and r["posterURL"]]
+        label = f"discovery {sec['id']!r} ({sec['title']})" + (f" page {page}" if page is not None else "")
+        check(rows and len(complete) == len(rows), f"{label}: {len(rows)} items, first {rows[0]['title'] if rows else None!r}")
+        seen[page] = {r["sourceID"] for r in rows}
+        if sec.get("semantic") == "genre" and page == 2 and rows and genre_pick is None:
+            genre_pick = (sec["title"], rows[0])
+    if len(seen) > 1:
+        first, second = sorted(seen)[:2]
+        check(seen[first] and not seen[first] & seen[second], f"discovery {sec['id']!r}: page {second} differs from page {first}")
+
+if genre_pick:
+    genre, row = genre_pick
+    print(f"\n=== genre {genre!r} page 2: {row['title']!r}, titleID {row['sourceID']}")
+    open_title(row["sourceID"], streams=False)
+
+for query in titles:
+    print(f"\n=== search {query!r}")
+    hits = search(query)
+    check(hits, f"search returns results ({len(hits)})")
+    if not hits:
+        continue
+    complete = [h for h in hits if h["sourceID"] and SLUG.fullmatch(h["sourceID"]) and h["title"]]
+    check(len(complete) == len(hits), f"every hit is a series with ID and title: {[h['sourceID'] for h in hits]}")
+    if "posterURL" in hits[0]:
+        posters = [h for h in hits if h.get("posterURL")]
+        check(len(posters) == len(hits) and is_image(posters[0]["posterURL"]),
+              f"every hit has a poster ({len(posters)}/{len(hits)}), first {posters[0]['posterURL'] if posters else None}")
+    title_id = hits[0]["sourceID"]
+    print("   titleID:", title_id, "|", hits[0]["title"])
+    open_title(title_id)
 
 print("\nRESULT:", "ALL PASS" if ok else "FAILURES")
 sys.exit(0 if ok else 1)
