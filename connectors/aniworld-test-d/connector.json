@@ -1,0 +1,563 @@
+{
+  "schemaVersion": 1,
+  "id": "aniworld-test-d",
+  "familyID": "aniworld-test-d",
+  "name": "AniWorld Test D",
+  "version": "0.1.0",
+  "minimumAppVersion": "2.0.36",
+  "requiredEngineFeatures": [
+    "form-post-v1",
+    "mapped-episode-panels-v1",
+    "html-text-v1",
+    "literal-object-projection-v1",
+    "empty-json-collection-v1",
+    "bounded-mirrors-v1"
+  ],
+  "contentType": "video",
+  "language": "de",
+  "contentRating": "unknown",
+  "releaseTrack": "beta",
+  "status": "active",
+  "authorization": {
+    "basis": "personal",
+    "note": "Experimental declarative connector. Use only content you are entitled to access; no third-party content or distribution rights are supplied."
+  },
+  "allowedHosts": [
+    "aniworld.to",
+    "vidmoly.net",
+    "vidmoly.biz"
+  ],
+  "capabilities": [
+    "discovery",
+    "search",
+    "details",
+    "episodes",
+    "streams"
+  ],
+  "limits": {
+    "timeoutMilliseconds": 8000,
+    "maxConcurrentRequests": 2,
+    "maxResponseBytes": 4194304
+  },
+  "operations": {
+    "search": {
+      "request": {
+        "method": "GET",
+        "urlTemplate": "https://aniworld.to/ajax/seriesSearch?keyword={query}",
+        "headers": {
+          "Referer": "https://aniworld.to/search",
+          "X-Requested-With": "XMLHttpRequest"
+        }
+      },
+      "response": {
+        "format": "json-empty-array"
+      },
+      "items": {
+        "collection": "[*]",
+        "fields": {
+          "sourceID": {
+            "path": "link",
+            "transforms": [
+              {
+                "op": "lastPathComponent"
+              }
+            ]
+          },
+          "title": {
+            "path": "name",
+            "transforms": [
+              {
+                "op": "htmlText"
+              }
+            ]
+          },
+          "posterURL": {
+            "path": "cover",
+            "transforms": [
+              {
+                "op": "absolutize"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "details": {
+      "request": {
+        "method": "GET",
+        "urlTemplate": "https://aniworld.to/anime/stream/{titleID}"
+      },
+      "response": {
+        "format": "html"
+      },
+      "extract": {
+        "title": {
+          "selector": "h1",
+          "part": "text"
+        },
+        "synopsis": {
+          "selector": "[data-full-description]",
+          "part": "attr",
+          "attr": "data-full-description"
+        },
+        "posterURL": {
+          "selector": ".seriesCoverBox img",
+          "part": "attr",
+          "attr": "data-src",
+          "transforms": [
+            {
+              "op": "absolutize"
+            }
+          ]
+        },
+        "genres": {
+          "collection": "div.genres li a[itemprop=genre]"
+        }
+      }
+    },
+    "episodes": {
+      "request": {
+        "method": "GET",
+        "urlTemplate": "https://aniworld.to/anime/stream/{titleID}"
+      },
+      "response": {
+        "format": "html"
+      },
+      "extract": {
+        "collection": "#stream a[href*='/staffel-']:not([href*='/episode-'])",
+        "fields": {
+          "episodeID": {
+            "selector": "a",
+            "part": "attr",
+            "attr": "href",
+            "transforms": [
+              {
+                "op": "lastPathComponent"
+              }
+            ]
+          },
+          "seasonNumber": {
+            "selector": "a",
+            "part": "attr",
+            "attr": "href",
+            "transforms": [
+              {
+                "op": "lastPathComponent"
+              },
+              {
+                "op": "firstInteger"
+              }
+            ]
+          }
+        }
+      },
+      "panels": {
+        "listURL": {
+          "selector": "a",
+          "part": "attr",
+          "attr": "href",
+          "transforms": [
+            {
+              "op": "absolutize"
+            }
+          ]
+        },
+        "variant": {
+          "literal": "dub"
+        },
+        "response": {
+          "format": "html"
+        },
+        "maxPanels": 50,
+        "items": {
+          "collection": "tr[data-episode-id]",
+          "fields": {
+            "episodeNumber": {
+              "selector": "a[href*='/episode-']",
+              "part": "attr",
+              "attr": "href",
+              "transforms": [
+                {
+                  "op": "lastPathComponent"
+                },
+                {
+                  "op": "firstInteger"
+                }
+              ]
+            },
+            "episodeURL": {
+              "selector": "a[href*='/episode-']",
+              "part": "attr",
+              "attr": "href",
+              "transforms": [
+                {
+                  "op": "absolutize"
+                }
+              ]
+            },
+            "title": {
+              "selector": "strong",
+              "part": "text"
+            }
+          }
+        }
+      }
+    },
+    "streams": {
+      "mirrors": [
+        {
+          "variants": [
+            "dub"
+          ],
+          "inputHosts": [
+            "aniworld.to"
+          ],
+          "finalMediaPolicy": "public-https",
+          "steps": [
+            {
+              "request": {
+                "method": "GET",
+                "follow": "episodeURL"
+              },
+              "response": {
+                "format": "html"
+              },
+              "extract": {
+                "context": {
+                  "embed": {
+                    "kind": "url",
+                    "selector": "li[data-lang-key='1'][data-link-target]:has(h4:contains(Vidmoly))",
+                    "part": "attr",
+                    "attr": "data-link-target",
+                    "transforms": [
+                      {
+                        "op": "absolutize"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "request": {
+                "method": "GET",
+                "follow": "embed",
+                "headers": {
+                  "Referer": "https://aniworld.to/"
+                }
+              },
+              "response": {
+                "format": "literal-selection",
+                "scriptSelector": "script:containsData(player.setup)",
+                "selection": {
+                  "kind": "call-object-fields",
+                  "name": "player.setup",
+                  "properties": [
+                    "sources"
+                  ]
+                }
+              },
+              "extract": {
+                "collection": "value.sources[*]",
+                "fields": {
+                  "url": {
+                    "path": "file",
+                    "transforms": [
+                      {
+                        "op": "absolutize"
+                      }
+                    ]
+                  },
+                  "mediaTypeHint": {
+                    "literal": "hls"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "variants": [
+            "dub"
+          ],
+          "inputHosts": [
+            "aniworld.to"
+          ],
+          "finalMediaPolicy": "public-https",
+          "steps": [
+            {
+              "request": {
+                "method": "GET",
+                "follow": "episodeURL"
+              },
+              "response": {
+                "format": "html"
+              },
+              "extract": {
+                "context": {
+                  "embed": {
+                    "kind": "url",
+                    "selector": "li[data-lang-key='3'][data-link-target]:has(h4:contains(Vidmoly))",
+                    "part": "attr",
+                    "attr": "data-link-target",
+                    "transforms": [
+                      {
+                        "op": "absolutize"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "request": {
+                "method": "GET",
+                "follow": "embed",
+                "headers": {
+                  "Referer": "https://aniworld.to/"
+                }
+              },
+              "response": {
+                "format": "literal-selection",
+                "scriptSelector": "script:containsData(player.setup)",
+                "selection": {
+                  "kind": "call-object-fields",
+                  "name": "player.setup",
+                  "properties": [
+                    "sources"
+                  ]
+                }
+              },
+              "extract": {
+                "collection": "value.sources[*]",
+                "fields": {
+                  "url": {
+                    "path": "file",
+                    "transforms": [
+                      {
+                        "op": "absolutize"
+                      }
+                    ]
+                  },
+                  "mediaTypeHint": {
+                    "literal": "hls"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "variants": [
+            "dub"
+          ],
+          "inputHosts": [
+            "aniworld.to"
+          ],
+          "finalMediaPolicy": "public-https",
+          "steps": [
+            {
+              "request": {
+                "method": "GET",
+                "follow": "episodeURL"
+              },
+              "response": {
+                "format": "html"
+              },
+              "extract": {
+                "context": {
+                  "embed": {
+                    "kind": "url",
+                    "selector": "li[data-lang-key='2'][data-link-target]:has(h4:contains(Vidmoly))",
+                    "part": "attr",
+                    "attr": "data-link-target",
+                    "transforms": [
+                      {
+                        "op": "absolutize"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              "request": {
+                "method": "GET",
+                "follow": "embed",
+                "headers": {
+                  "Referer": "https://aniworld.to/"
+                }
+              },
+              "response": {
+                "format": "literal-selection",
+                "scriptSelector": "script:containsData(player.setup)",
+                "selection": {
+                  "kind": "call-object-fields",
+                  "name": "player.setup",
+                  "properties": [
+                    "sources"
+                  ]
+                }
+              },
+              "extract": {
+                "collection": "value.sources[*]",
+                "fields": {
+                  "url": {
+                    "path": "file",
+                    "transforms": [
+                      {
+                        "op": "absolutize"
+                      }
+                    ]
+                  },
+                  "mediaTypeHint": {
+                    "literal": "hls"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "discovery": {
+      "sections": [
+        {
+          "id": "new",
+          "title": "Neu auf AniWorld",
+          "semantic": "recent",
+          "request": {
+            "method": "GET",
+            "urlTemplate": "https://aniworld.to/neu"
+          },
+          "response": {
+            "format": "html"
+          },
+          "pagination": {
+            "type": "none"
+          },
+          "items": {
+            "collection": "a[href^='/anime/stream/']:has(img[data-src]):has(h3):not([href*='/staffel-']):not([href*='/episode-'])",
+            "fields": {
+              "sourceID": {
+                "selector": "a",
+                "part": "attr",
+                "attr": "href",
+                "transforms": [
+                  {
+                    "op": "lastPathComponent"
+                  }
+                ]
+              },
+              "title": {
+                "selector": "h3",
+                "part": "text"
+              },
+              "posterURL": {
+                "selector": "img[data-src]",
+                "part": "attr",
+                "attr": "data-src",
+                "transforms": [
+                  {
+                    "op": "absolutize"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "popular",
+          "title": "Beliebt auf AniWorld",
+          "semantic": "popular",
+          "request": {
+            "method": "GET",
+            "urlTemplate": "https://aniworld.to/beliebte-animes"
+          },
+          "response": {
+            "format": "html"
+          },
+          "pagination": {
+            "type": "none"
+          },
+          "items": {
+            "collection": "a[href^='/anime/stream/']:has(img[data-src]):has(h3):not([href*='/staffel-']):not([href*='/episode-'])",
+            "fields": {
+              "sourceID": {
+                "selector": "a",
+                "part": "attr",
+                "attr": "href",
+                "transforms": [
+                  {
+                    "op": "lastPathComponent"
+                  }
+                ]
+              },
+              "title": {
+                "selector": "h3",
+                "part": "text"
+              },
+              "posterURL": {
+                "selector": "img[data-src]",
+                "part": "attr",
+                "attr": "data-src",
+                "transforms": [
+                  {
+                    "op": "absolutize"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "id": "all",
+          "title": "Alle Animes mit German Dub",
+          "semantic": "all",
+          "request": {
+            "method": "GET",
+            "urlTemplate": "https://aniworld.to/genre/ger/{page}"
+          },
+          "response": {
+            "format": "html"
+          },
+          "pagination": {
+            "type": "pageParam",
+            "start": 1,
+            "maxPages": 25
+          },
+          "items": {
+            "collection": "a[href^='/anime/stream/']:has(img[data-src]):has(h3):not([href*='/staffel-']):not([href*='/episode-'])",
+            "fields": {
+              "sourceID": {
+                "selector": "a",
+                "part": "attr",
+                "attr": "href",
+                "transforms": [
+                  {
+                    "op": "lastPathComponent"
+                  }
+                ]
+              },
+              "title": {
+                "selector": "h3",
+                "part": "text"
+              },
+              "posterURL": {
+                "selector": "img[data-src]",
+                "part": "attr",
+                "attr": "data-src",
+                "transforms": [
+                  {
+                    "op": "absolutize"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "releaseNotes": "TEMPORARY TEST, will be removed. Find a Niche test D: declares no item genres; all genres of the title page as details genres together with a paged All catalogue (only already-accepted keys). Browse All pages through AniWorld's German Dub list (25 pages). Playback, search and details as AniWorld Deutsch 1.4.0."
+}

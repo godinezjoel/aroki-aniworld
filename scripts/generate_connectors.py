@@ -15,6 +15,9 @@ Shapes taken from other Aroki-accepted kas021 manifests (values changed only):
 - search: GET JSON search with a posterURL path + absolutize (AniPM 0.1.2)
 - genre sections: semantic "genre" with pageParam pagination (AniKoto 0.3.x)
 
+Temporary Find a Niche test connectors (aniworld-test-a ... -d) are copies of
+aniworld-deutsch, each declaring genres in one candidate way; see NICHE_TESTS.
+
 Usage: py scripts/generate_connectors.py templates/aniworld-0.3.2.json
 """
 
@@ -49,6 +52,35 @@ GENRES = (
     ("romanze", "Romanze", 25),
     ("scifi", "Scifi", 16),
     ("sport", "Sport", 5),
+)
+
+# --- Temporary Find a Niche test connectors -------------------------------------
+# AROKI's Find a Niche says "This collection has not declared genre metadata yet"
+# for AniWorld Deutsch 1.4.0 (genre sections) and AnimeGG (details genres only).
+# Each test connector is a copy of aniworld-deutsch with the 12 genre sections
+# dropped, a paged All list, and one candidate genre declaration.
+#
+# All list: /genre/ger/<page> is AniWorld's German Dub list, alphabetical, 30 cards
+# per page with posters; 35 pages (1034 titles) on 2026-10-25, page 36 is HTTP 404.
+# maxPages 25 (the largest in an accepted manifest) reaches 750 titles, # to "S".
+ALL_LIST = ("https://aniworld.to/genre/ger/{page}", 25)
+# Every AniWorld list card (/neu, /beliebte-animes, /genre/..., /katalog/...) names
+# its main genre in <small>, e.g. <small>Abenteuer</small>. One value per card,
+# never padded with whitespace, so no transform: exactly the {collection} shape of
+# AniKage 0.3.0's items.metadata.genres.
+CARD_GENRE = {"collection": "small"}
+# Title pages list all genres (plus the language tags Ger, GerSub, EngSub).
+# Shape of kas021's details genres (DonghuaWorld, AniKoto).
+DETAILS_GENRES = {"collection": "div.genres li a[itemprop=genre]"}
+# letter, what it declares (for the release notes), item metadata, item field, details
+NICHE_TESTS = (
+    ("a", "each Browse item's main genre as items.metadata.genres (the shape of kas021's "
+          "AniKage 0.3.0 and DonghuaWorld 1.1.1)", True, False, False),
+    ("b", "each Browse item's main genre as an item field, items.fields.genres", False, True, False),
+    ("c", "each Browse item's main genre as items.metadata.genres, plus all genres of the title "
+          "page as details genres", True, False, True),
+    ("d", "no item genres; all genres of the title page as details genres together with a paged "
+          "All catalogue (only already-accepted keys)", False, False, True),
 )
 
 
@@ -126,6 +158,41 @@ def discovery_sections(base: dict, home_title: str) -> list[dict]:
     return rows
 
 
+def niche_sections(deutsch: dict) -> list[dict]:
+    """Neu and Beliebt as in aniworld-deutsch, then a paged All list instead of the front page."""
+    rows = {row["id"]: row for row in deutsch["operations"]["discovery"]["sections"]}
+    all_row = copy.deepcopy(rows["home"])
+    all_row["id"], all_row["title"] = "all", "Alle Animes mit German Dub"
+    url, max_pages = ALL_LIST
+    all_row["request"]["urlTemplate"] = url
+    all_row["pagination"] = {"type": "pageParam", "start": 1, "maxPages": max_pages}
+    return [copy.deepcopy(rows["new"]), copy.deepcopy(rows["popular"]), all_row]
+
+
+def build_niche_test(deutsch: dict, letter: str, declares: str, *, item_metadata: bool,
+                     item_field: bool, details_genres: bool) -> dict:
+    """Temporary copy of aniworld-deutsch with one candidate genre declaration."""
+    manifest = copy.deepcopy(deutsch)
+    manifest["id"] = manifest["familyID"] = f"aniworld-test-{letter}"
+    manifest["name"] = f"AniWorld Test {letter.upper()}"
+    manifest["version"] = "0.1.0"
+    sections = niche_sections(deutsch)
+    for row in sections:
+        if item_metadata:
+            row["items"]["metadata"] = {"genres": copy.deepcopy(CARD_GENRE)}
+        if item_field:
+            row["items"]["fields"]["genres"] = copy.deepcopy(CARD_GENRE)
+    manifest["operations"]["discovery"]["sections"] = sections
+    if details_genres:
+        manifest["operations"]["details"]["extract"]["genres"] = copy.deepcopy(DETAILS_GENRES)
+    manifest["releaseNotes"] = (
+        f"TEMPORARY TEST, will be removed. Find a Niche test {letter.upper()}: declares {declares}. "
+        f"Browse All pages through AniWorld's German Dub list ({ALL_LIST[1]} pages). "
+        "Playback, search and details as AniWorld Deutsch 1.4.0."
+    )
+    return manifest
+
+
 def build_english_dub(base: dict) -> dict:
     """English Dub only, from kas021's AnimeGG 1.1.1 (per-episode Sub/Dub, MP4 via vidcache)."""
     manifest = copy.deepcopy(base)
@@ -195,6 +262,11 @@ def main() -> None:
             ),
         ),
         build_english_dub(animegg),
+    ]
+    connectors += [
+        build_niche_test(connectors[0], letter, declares, item_metadata=metadata,
+                         item_field=field, details_genres=details)
+        for letter, declares, metadata, field, details in NICHE_TESTS
     ]
     for manifest in connectors:
         path = ROOT / "connectors" / manifest["id"] / "connector.json"
