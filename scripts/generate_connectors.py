@@ -11,6 +11,10 @@ the published kas021 AniWorld 0.3.2 manifest and only change values:
 AniWorld hoster language keys: 1 = German audio, 2 = English subtitles,
 3 = German subtitles.
 
+Shapes taken from other Aroki-accepted kas021 manifests (values changed only):
+- search: GET JSON search with a posterURL path + absolutize (AniPM 0.1.2)
+- genre sections: semantic "genre" with pageParam pagination (AniKoto 0.3.x)
+
 Usage: py scripts/generate_connectors.py templates/aniworld-0.3.2.json
 """
 
@@ -23,6 +27,29 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 LANG_KEYS = {"de-dub": "1", "en-sub": "2", "de-sub": "3"}
+
+# Main genres from AniWorld's own genre list (front page, ul.homeContentGenresList),
+# in the site's order and spelling. Left out: language tags (Ger, GerSub, EngSub),
+# adult or content flags, compound sub-genres (Actiondrama, Romantische Komoedie,
+# ...) and genres with only a handful of titles.
+# Genre pages list 30 titles per page, alphabetically, at /genre/<slug>/<page>;
+# a page past the last one is HTTP 404. maxPages is the genre's page count on
+# 2026-10-25, capped at 25 (the largest maxPages in an accepted manifest), so the
+# app never asks for a page that does not exist.
+GENRES = (
+    ("abenteuer", "Abenteuer", 23),
+    ("action", "Action", 25),
+    ("alltagsleben", "Alltagsleben", 25),
+    ("drama", "Drama", 25),
+    ("fantasy", "Fantasy", 25),
+    ("horror", "Horror", 5),
+    ("komoedie", "Komödie", 25),
+    ("mecha", "Mecha", 4),
+    ("mystery", "Mystery", 11),
+    ("romanze", "Romanze", 25),
+    ("scifi", "Scifi", 16),
+    ("sport", "Sport", 5),
+)
 
 
 def vidmoly_mirror(template: dict, lang_key: str, variant: str) -> dict:
@@ -46,17 +73,38 @@ def build(base: dict, *, connector_id: str, name: str, version: str, language: s
     manifest["operations"]["streams"]["mirrors"] = [
         vidmoly_mirror(template, LANG_KEYS[key], variant) for key in order
     ]
+    manifest["operations"]["search"] = search_with_posters(base)
     manifest["operations"]["discovery"]["sections"] = discovery_sections(base, section_title)
     manifest["releaseNotes"] = notes
     return manifest
 
 
-def discovery_sections(base: dict, home_title: str) -> list[dict]:
-    """Home rows: new and popular list pages, then the full front page.
+def search_with_posters(base: dict) -> dict:
+    """Search through /ajax/seriesSearch, the endpoint of AniWorld's own header search.
 
-    All rows reuse the accepted front-page section; only id, title, semantic
-    and URL change. The item selector matches AniWorld's cover cards on /neu
-    and /beliebte-animes as well as on the front page.
+    Unlike the POST /ajax/search of 0.3.2, it returns only series (no episodes,
+    actors or forum posts) and includes each series' cover. Same response format
+    (it answers [] for no match); GET request shaped like AniKoto's and AniPM's.
+    """
+    search = copy.deepcopy(base["operations"]["search"])
+    request = search["request"]
+    request["method"] = "GET"
+    request["urlTemplate"] = "https://aniworld.to/ajax/seriesSearch?keyword={query}"
+    del request["formFields"]
+    fields = search["items"]["fields"]
+    fields["title"]["path"] = "name"
+    fields["posterURL"] = {"path": "cover", "transforms": [{"op": "absolutize"}]}
+    return search
+
+
+def discovery_sections(base: dict, home_title: str) -> list[dict]:
+    """Home rows (new, popular, front page), then one Browse section per genre.
+
+    All sections reuse the accepted front-page section; only id, title, semantic,
+    URL and pagination values change. The item selector matches AniWorld's cover
+    cards on /neu, /beliebte-animes, /genre/<slug>/<page> and the front page, so
+    every section yields the same sourceID (the /anime/stream/<slug> slug).
+    /neu and /beliebte-animes are single pages; genre pages paginate.
     """
     home = base["operations"]["discovery"]["sections"][0]
     rows = []
@@ -68,6 +116,12 @@ def discovery_sections(base: dict, home_title: str) -> list[dict]:
         row = copy.deepcopy(home)
         row["id"], row["title"], row["semantic"] = row_id, title, semantic
         row["request"]["urlTemplate"] = "https://aniworld.to" + path
+        rows.append(row)
+    for slug, title, max_pages in GENRES:
+        row = copy.deepcopy(home)
+        row["id"], row["title"], row["semantic"] = f"genre-{slug}", title, "genre"
+        row["request"]["urlTemplate"] = f"https://aniworld.to/genre/{slug}/{{page}}"
+        row["pagination"] = {"type": "pageParam", "start": 1, "maxPages": max_pages}
         rows.append(row)
     return rows
 
@@ -114,28 +168,30 @@ def main() -> None:
             base,
             connector_id="aniworld-deutsch",
             name="AniWorld Deutsch",
-            version="1.3.0",
+            version="1.4.0",
             language="de",
             variant="dub",
             order=["de-dub", "de-sub", "en-sub"],
             section_title="AniWorld Deutsch",
             notes=(
                 "German Dub first. If an episode has no German audio, playback falls back to "
-                "Japanese audio with German subtitles, then English subtitles. Streams via Vidmoly."
+                "Japanese audio with German subtitles, then English subtitles. Streams via Vidmoly. "
+                "Search shows posters; Browse has AniWorld's popular titles and main genres."
             ),
         ),
         build(
             base,
             connector_id="aniworld-omu",
             name="AniWorld OmU",
-            version="1.3.0",
+            version="1.4.0",
             language="mul",
             variant="sub",
             order=["de-sub", "en-sub"],
             section_title="AniWorld OmU",
             notes=(
                 "Original audio (mostly Japanese) with German subtitles, English-subtitle fallback. "
-                "Use AniWorld Deutsch for German Dub. Streams via Vidmoly."
+                "Use AniWorld Deutsch for German Dub. Streams via Vidmoly. "
+                "Search shows posters; Browse has AniWorld's popular titles and main genres."
             ),
         ),
         build_english_dub(animegg),

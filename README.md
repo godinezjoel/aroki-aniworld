@@ -28,6 +28,22 @@ code and cannot be described declaratively.
 AniWorld Deutsch labels every episode as Dub. Episodes without German audio
 still play, using the subtitle fallback.
 
+Both AniWorld connectors share the same discovery and search. Their search
+and genre sections reuse shapes from two other Aroki-accepted kas021
+manifests, AniPM and AniKoto, with values changed only:
+
+- **Home rows:** Neu auf AniWorld (`/neu`), Beliebt auf AniWorld
+  (`/beliebte-animes`, `semantic: popular`) and the front page.
+- **Browse genres:** twelve main AniWorld genres (`semantic: genre`), paged
+  through `/genre/<slug>/<page>`, 30 titles per page in AniWorld's alphabetical
+  order. The list and per-genre page limits are `GENRES` in
+  `scripts/generate_connectors.py`. A limit is the genre's page count, at most
+  25, because pages past the last one return HTTP 404; the largest genres
+  therefore end partway through the alphabet (Action and Komödie around K).
+- **Search:** `/ajax/seriesSearch`, the endpoint behind AniWorld's own header
+  search. It returns series only (no episodes, voice actors or forum posts),
+  each with a poster, up to 15 hits.
+
 ## Add it in AROKI
 
 1. **Profile → Sources → Add verified repository**.
